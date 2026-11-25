@@ -2,13 +2,175 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>8-Bit Retro Game Trivia</title>
+
+    <!-- Press Start 2P Font (required for NES.css look) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+    <!-- NES.css (CSS-only framework, zero JavaScript) -->
+    <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+
+    <!-- Custom Layout & Responsive Overrides -->
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+    <header class="site-header">
+        <div class="header-inner">
+            <i class="nes-icon trophy is-medium"></i>
+            <h1>RETRO QUEST TRIVIA</h1>
+            <i class="nes-icon coin is-medium"></i>
+        </div>
+        <p class="subtitle">10 RANDOM STAGES // INSERT BRAIN TO PLAY</p>
+    </header>
 
+    <main class="page-wrapper">
+        <!-- ==================== 1. ACTIVE QUIZ SECTION ==================== -->
+        <section id="quiz-section" class="nes-container is-dark with-title">
+            <p class="title">STAGE PLAY</p>
+
+            <!-- HUD Bar: Question Progress & Live Score -->
+            <div class="hud-bar">
+                <span id="question-counter" class="nes-text is-warning">STAGE 1 / 10</span>
+                <span id="score-display" class="nes-text is-success">SCORE: 0</span>
+            </div>
+
+            <!-- Dynamic Image updated via JS DOM scripting -->
+            <div class="image-frame">
+                <img id="question-image" src="images/placeholder-console.png" alt="Retro video game trivia clue" />
+            </div>
+
+            <!-- Question Prompt -->
+            <h2 id="question-text" class="question-prompt">
+                Loading stage data...
+            </h2>
+
+            <!-- Answer Form (uses HTML form inputs instead of prompt/alert) -->
+            <form id="quiz-form" novalidate>
+                <div id="answers-container" class="answers-grid">
+                    <!-- Your JS can either update these 4 labels/radios OR generate them dynamically -->
+                    <label class="answer-card">
+                        <input type="radio" class="nes-radio is-dark" name="answer" value="0" />
+                        <span id="choice-0">Option A</span>
+                    </label>
+
+                    <label class="answer-card">
+                        <input type="radio" class="nes-radio is-dark" name="answer" value="1" />
+                        <span id="choice-1">Option B</span>
+                    </label>
+
+                    <label class="answer-card">
+                        <input type="radio" class="nes-radio is-dark" name="answer" value="2" />
+                        <span id="choice-2">Option C</span>
+                    </label>
+
+                    <label class="answer-card">
+                        <input type="radio" class="nes-radio is-dark" name="answer" value="3" />
+                        <span id="choice-3">Option D</span>
+                    </label>
+                </div>
+
+                <!-- Inline validation / feedback message -->
+                <p id="quiz-feedback" class="feedback-msg nes-text is-error" aria-live="polite"></p>
+
+                <div class="form-actions">
+                    <button type="submit" id="submit-answer-btn" class="nes-btn is-primary">
+                        LOCK IN ANSWER
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ==================== 2. GAME OVER / RESULTS SECTION ==================== -->
+        <section id="results-section" class="nes-container is-dark with-title is-hidden">
+            <p class="title">GAME OVER</p>
+
+            <div class="results-box">
+                <i class="nes-icon star is-large"></i>
+                <h2>FINAL SCORE</h2>
+                <p id="final-score-text" class="final-score nes-text is-warning">
+                    You answered 0 out of 10 correctly!
+                </p>
+                <p id="rank-message" class="rank-text"> rank: 8-BIT ROOKIE </p>
+
+                <button type="button" id="play-again-btn" class="nes-btn is-success">
+                    PLAY AGAIN
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== 3. ADD NEW QUESTION (LOCALSTORAGE) ==================== -->
+        <section id="add-question-section" class="nes-container is-dark with-title">
+            <p class="title">CARTRIDGE LAB // ADD QUESTION</p>
+
+            <form id="add-question-form" novalidate>
+                <div class="nes-field">
+                    <label for="new-question">Question Text</label>
+                    <input type="text" id="new-question" class="nes-input is-dark"
+                        placeholder="e.g., What year was the SNES released in North America?" />
+                </div>
+
+                <div class="options-form-grid">
+                    <div class="nes-field">
+                        <label for="option-a">Option A</label>
+                        <input type="text" id="option-a" class="nes-input is-dark" placeholder="Answer 1" />
+                    </div>
+
+                    <div class="nes-field">
+                        <label for="option-b">Option B</label>
+                        <input type="text" id="option-b" class="nes-input is-dark" placeholder="Answer 2" />
+                    </div>
+
+                    <div class="nes-field">
+                        <label for="option-c">Option C</label>
+                        <input type="text" id="option-c" class="nes-input is-dark" placeholder="Answer 3" />
+                    </div>
+
+                    <div class="nes-field">
+                        <label for="option-d">Option D</label>
+                        <input type="text" id="option-d" class="nes-input is-dark" placeholder="Answer 4" />
+                    </div>
+                </div>
+
+                <div class="options-form-grid">
+                    <div class="nes-field">
+                        <label for="correct-answer">Correct Answer</label>
+                        <div class="nes-select is-dark">
+                            <select id="correct-answer">
+                                <option value="">-- Select Correct Option --</option>
+                                <option value="0">Option A</option>
+                                <option value="1">Option B</option>
+                                <option value="2">Option C</option>
+                                <option value="3">Option D</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="nes-field">
+                        <label for="question-img-url">Image File / URL</label>
+                        <input type="text" id="question-img-url" class="nes-input is-dark"
+                            placeholder="images/default-retro.png" />
+                    </div>
+                </div>
+
+                <!-- Validation & Save Status Message -->
+                <p id="form-feedback" class="feedback-msg" aria-live="polite"></p>
+
+                <div class="form-actions">
+                    <button type="submit" class="nes-btn is-warning">
+                        SAVE TO MEMORY CARD
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <!-- Write your own JavaScript in script.js -->
+    <script src="script.js"></script>
 </body>
 
 </html>
